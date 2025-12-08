@@ -84,27 +84,43 @@ def build_figures(data):
     extract_time = data["extract_time"]
 
     fig1, ax1 = plt.subplots(figsize=(8, 5))
-    ax1.plot(t, data["R_bse_hf"], "k-", label="Bulk Silicate Earth", linewidth=2)
+    ax1.plot(t, data["R_bse_hf"], "k-", label="Bulk Silicate Earth (BSE)", linewidth=2)
     ax1.plot(t, data["R_depleted_hf"], "r--", label="Depleted Mantle", linewidth=2)
-    ax1.plot(t, data["R_crust_hf"], "b:", label="Crust", linewidth=2)
-    ax1.axvline(extract_time, color="gray", linestyle="-")
-    ax1.set_xlabel("Time (Ga)")
+    ax1.plot(t, data["R_crust_hf"], "b:", label="Continental Crust", linewidth=2)
+    ax1.axvline(extract_time, color="gray", linestyle="-", alpha=0.7, linewidth=1)
+    ax1.text(
+        extract_time + 0.05,
+        np.interp(extract_time, t[::-1], data["R_bse_hf"][::-1]),
+        f"Crust Extraction\n{extract_time:.2f} Ga",
+        va="bottom",
+    )
+    ax1.set_xlabel("Time (Ga before present)")
     ax1.set_ylabel("176Hf/177Hf")
+    ax1.set_title("Evolution of 176Hf/177Hf Isotopic Ratio")
+    ax1.legend(loc="upper right")
     ax1.set_xlim(4.5, 0)
     ax1.invert_xaxis()
-    ax1.grid(True)
+    ax1.grid(True, alpha=0.3)
     fig1.tight_layout()
 
     fig2, ax2 = plt.subplots(figsize=(8, 5))
-    ax2.plot(t, data["R_bse_nd"], "k-", label="Bulk Silicate Earth", linewidth=2)
+    ax2.plot(t, data["R_bse_nd"], "k-", label="Bulk Silicate Earth (BSE)", linewidth=2)
     ax2.plot(t, data["R_depleted_nd"], "r--", label="Depleted Mantle", linewidth=2)
-    ax2.plot(t, data["R_crust_nd"], "b:", label="Crust", linewidth=2)
-    ax2.axvline(extract_time, color="gray", linestyle="-")
-    ax2.set_xlabel("Time (Ga)")
+    ax2.plot(t, data["R_crust_nd"], "b:", label="Continental Crust", linewidth=2)
+    ax2.axvline(extract_time, color="gray", linestyle="-", alpha=0.7, linewidth=1)
+    ax2.text(
+        extract_time + 0.05,
+        np.interp(extract_time, t[::-1], data["R_bse_nd"][::-1]),
+        f"Crust Extraction\n{extract_time:.2f} Ga",
+        va="bottom",
+    )
+    ax2.set_xlabel("Time (Ga before present)")
     ax2.set_ylabel("143Nd/144Nd")
+    ax2.set_title("Evolution of 143Nd/144Nd Isotopic Ratio")
+    ax2.legend(loc="upper right")
     ax2.set_xlim(4.5, 0)
     ax2.invert_xaxis()
-    ax2.grid(True)
+    ax2.grid(True, alpha=0.3)
     fig2.tight_layout()
 
     return fig1, fig2
