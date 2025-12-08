@@ -1,4 +1,5 @@
 import os
+import time
 os.environ["TK_SILENCE_DEPRECATION"] = "1"
 
 import sys
@@ -168,9 +169,14 @@ class IsoEvolutionApp:
         self.show_selected()
 
     def save_pngs(self):
-        self.fig1.savefig("evolution_Hf.png", dpi=150, bbox_inches="tight")
-        self.fig2.savefig("evolution_Nd.png", dpi=150, bbox_inches="tight")
-        messagebox.showinfo("Saved", "PNG files saved.")
+        reports_dir = os.path.join(os.getcwd(), "photo-reports")
+        os.makedirs(reports_dir, exist_ok=True)
+        timestamp = time.strftime("%Y%m%d-%H%M%S")
+        hf_path = os.path.join(reports_dir, f"evolution_Hf({timestamp}).png")
+        nd_path = os.path.join(reports_dir, f"evolution_Nd({timestamp}).png")
+        self.fig1.savefig(hf_path, dpi=150, bbox_inches="tight")
+        self.fig2.savefig(nd_path, dpi=150, bbox_inches="tight")
+        messagebox.showinfo("Saved", f"Saved:\n{hf_path}\n{nd_path}")
 
     def show_selected(self):
         """Show only the selected plot (Hf or Nd) to avoid a huge window."""

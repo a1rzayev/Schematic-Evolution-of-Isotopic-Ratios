@@ -14,6 +14,7 @@ coverage*.xml
 .mplconfig/
 .cache/
 .matplotlib/
+photo-reports/
 evolution_Hf.png
 evolution_Nd.png
 
