@@ -11,6 +11,11 @@ env/
 .pytest_cache/
 coverage*.xml
 .coverage*
+.mplconfig/
+.cache/
+.matplotlib/
+evolution_Hf.png
+evolution_Nd.png
 
 # VS Code / Cursor
 .vscode/
