@@ -18,21 +18,27 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 def compute_evolution(extract_time: float = 2.9):
-    t = np.linspace(4.5, 0, 500)
-    years_bp = t * 1e9
+    T_earth_ga = 4.55
+    T_earth_yr = T_earth_ga * 1e9
+    t_extract_ga = extract_time
+    t_extract_yr = t_extract_ga * 1e9
 
-    lambda_hf = 1.9e-11
     lambda_nd = 6.54e-12
+    lambda_hf = 1.925e-11
 
-    R0_hf = 0.2798
-    R0_nd = 0.5068
+    R0_nd = 0.5067
+    R0_hf = 0.2800
 
-    PD_bse_hf = 0.033
-    PD_bse_nd = 0.196
-    PD_depleted_hf = 0.050
-    PD_depleted_nd = 0.250
-    PD_crust_hf = 0.010
-    PD_crust_nd = 0.120
+    PD_BSE_nd = 0.1967
+    PD_CC_nd = 0.156
+    PD_DM_nd = 0.222
+
+    PD_BSE_hf = 0.0333
+    PD_CC_hf = 0.016
+    PD_DM_hf = 0.04
+
+    t = np.linspace(T_earth_ga, 0, 500)
+    t_years = t * 1e9
 
     R_bse_hf = np.zeros_like(t)
     R_bse_nd = np.zeros_like(t)
@@ -41,29 +47,26 @@ def compute_evolution(extract_time: float = 2.9):
     R_crust_hf = np.zeros_like(t)
     R_crust_nd = np.zeros_like(t)
 
-    idx_extract = np.argmin(np.abs(t - extract_time))
+    R_extract_nd = R0_nd + PD_BSE_nd * (np.exp(lambda_nd * T_earth_yr) - np.exp(lambda_nd * t_extract_yr))
+    R_extract_hf = R0_hf + PD_BSE_hf * (np.exp(lambda_hf * T_earth_yr) - np.exp(lambda_hf * t_extract_yr))
 
-    for i, time_bp in enumerate(years_bp):
-        t_elapsed = 4.5e9 - time_bp
+    for i in range(len(t)):
+        t_now = t_years[i]
 
-        R_bse_hf[i] = R0_hf + PD_bse_hf * (np.exp(lambda_hf * t_elapsed) - 1)
-        R_bse_nd[i] = R0_nd + PD_bse_nd * (np.exp(lambda_nd * t_elapsed) - 1)
+        R_bse_nd[i] = R0_nd + PD_BSE_nd * (np.exp(lambda_nd * T_earth_yr) - np.exp(lambda_nd * t_now))
+        R_bse_hf[i] = R0_hf + PD_BSE_hf * (np.exp(lambda_hf * T_earth_yr) - np.exp(lambda_hf * t_now))
 
-        if t[i] >= extract_time:
-            R_depleted_hf[i] = R_bse_hf[i]
-            R_depleted_nd[i] = R_bse_nd[i]
-            R_crust_hf[i] = R_bse_hf[i]
+        if t[i] >= t_extract_ga:
             R_crust_nd[i] = R_bse_nd[i]
+            R_crust_hf[i] = R_bse_hf[i]
+            R_depleted_nd[i] = R_bse_nd[i]
+            R_depleted_hf[i] = R_bse_hf[i]
         else:
-            t_since_extract = (extract_time - t[i]) * 1e9
-            R_extract_hf = R_bse_hf[idx_extract]
-            R_extract_nd = R_bse_nd[idx_extract]
+            R_crust_nd[i] = R_extract_nd + PD_CC_nd * (np.exp(lambda_nd * t_extract_yr) - np.exp(lambda_nd * t_now))
+            R_crust_hf[i] = R_extract_hf + PD_CC_hf * (np.exp(lambda_hf * t_extract_yr) - np.exp(lambda_hf * t_now))
 
-            R_depleted_hf[i] = R_extract_hf + PD_depleted_hf * (np.exp(lambda_hf * t_since_extract) - 1)
-            R_depleted_nd[i] = R_extract_nd + PD_depleted_nd * (np.exp(lambda_nd * t_since_extract) - 1)
-
-            R_crust_hf[i] = R_extract_hf + PD_crust_hf * (np.exp(lambda_hf * t_since_extract) - 1)
-            R_crust_nd[i] = R_extract_nd + PD_crust_nd * (np.exp(lambda_nd * t_since_extract) - 1)
+            R_depleted_nd[i] = R_extract_nd + PD_DM_nd * (np.exp(lambda_nd * t_extract_yr) - np.exp(lambda_nd * t_now))
+            R_depleted_hf[i] = R_extract_hf + PD_DM_hf * (np.exp(lambda_hf * t_extract_yr) - np.exp(lambda_hf * t_now))
 
     return {
         "t": t,
